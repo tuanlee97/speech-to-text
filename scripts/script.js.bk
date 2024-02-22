@@ -1,0 +1,102 @@
+/*-------------------------------------------
+* Dùng kiểu Obfuscate khi render production. |
+*--------------------------------------------
+*/
+// Script cho chức năng Speech to Text
+function runSpeechRecognition() {
+    var output = document.getElementById("output");
+    var action = document.getElementById("action");
+    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+    var recognition = new SpeechRecognition();
+
+    recognition.onstart = function () {
+        output.classList.add("hide");
+        action.innerHTML = "<small>Đang lắng nghe...</small>";
+    };
+
+    recognition.onspeechend = function () {
+        action.innerHTML = "<small>Dừng lắng nghe, hy vọng bạn đã hoàn thành...</small>";
+        recognition.stop();
+    }
+
+    recognition.onresult = function (event) {
+        var transcript = event.results[0][0].transcript;
+        var confidence = event.results[0][0].confidence;
+        output.classList.toggle("hide");
+        output.innerHTML = "<b>Văn Bản:</b> " + transcript + "<br/> <b>Độ Chính Xác:</b> " + confidence * 100 + "%";
+    };
+
+    recognition.start();
+}
+
+// Script cho chức năng kiểm tra ngữ pháp
+function checkGrammar() {
+    var loadingContainer =
+        `<div class="loading">
+        <div class="loading-container">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>`;
+    var grammarErrorsElement = document.getElementById("grammarErrors");
+    grammarErrorsElement.innerHTML = `<h2>Grammar Results:</h2> ${loadingContainer}`;
+    var inputText = document.getElementById("inputText").value;
+    // Tạo yêu cầu POST bằng Fetch
+    fetch('https://api.languagetool.org/v2/check', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'text=' + encodeURIComponent(inputText) + '&language=auto'
+    })
+        .then(response => response.json())
+        .then(data => {
+            var errors = data.matches;
+            var html = '';
+            if (errors && errors.length > 0) {
+                html = '<h2>Grammar Errors:</h2><ul>';
+                errors.forEach(function (error) {
+                    html += '<li>' + error.message + ' - At position ' + error.offset + '</li>';
+                });
+                html += '</ul>';
+                grammarErrorsElement.innerHTML = html;
+            } else {
+                html = '<h2>Grammar Results:</h2>';
+                html += '<p>No grammar errors found.</p>';
+                grammarErrorsElement.innerHTML = html;
+            }
+        })
+        .catch(error => {
+            console.error("Error sending request:", error);
+            grammarErrorsElement.innerHTML = '<p>An error occurred while checking grammar. Please try again later.</p>';
+        });
+
+}
+
+// Script cho chức năng chuyển tab
+function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+// Mặc định mở tab Speech to Text khi tải trang
+document.getElementById("defaultOpen")?.click();
