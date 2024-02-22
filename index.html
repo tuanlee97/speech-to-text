@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech to Text & Grammar Check</title>
+    <style>
+        /* CSS */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .tab {
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+        }
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+        }
+        .tab button:hover {
+            background-color: #ddd;
+        }
+        .tab button.active {
+            background-color: #ccc;
+        }
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border: 1px solid #ccc;
+            border-top: none;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script defer src="/demo/scripts/script.js"></script>
+</head>
+<body>
+
+<div class="tab">
+    <button class="tablinks" onclick="openTab(event, 'speechToText')">Speech to Text</button>
+    <button class="tablinks" onclick="openTab(event, 'grammarCheck')">Grammar Check</button>
+</div>
+
+<div id="speechToText" class="tabcontent">
+    <h2>Speech to Text</h2>
+    <p>Nhấn vào nút bên dưới và nói ...</p>
+    <p><button type="button" onclick="runSpeechRecognition()">Bắt Đầu</button> &nbsp; <span id="action"></span></p>
+    <div id="output" class="hide"></div>
+</div>
+
+<div id="grammarCheck" class="tabcontent">
+    <h2>Grammar Check</h2>
+    <textarea id="inputText" rows="4" cols="50" placeholder="Nhập câu cần kiểm tra ngữ pháp"></textarea><br>
+    <button onclick="checkGrammar()">Kiểm Tra Ngữ Pháp</button>
+    <div id="output"></div>
+</div>
+</body>
+</html>
